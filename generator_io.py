@@ -56,10 +56,10 @@ class BaseIO:
 class GeneratorIO(BaseIO):
 
     def __init__(self, file_path, debug=False, output_file=None):
-        super().__init__(file_path)  # Call the parent class's constructor
+        super().__init__(file_path)  
         self.debug = debug
         if output_file:
-            self.output_file = output_file  # Set the output file if provided
+            self.output_file = output_file
 
 
     def _process_line(self, line, data, current_section, catalyzer_params_counter):
@@ -133,9 +133,9 @@ class GeneratorIO(BaseIO):
         print(", ".join([species[0] for species in data["species"][self.initial_species_count:]]))
         print()
         print(f"{self.counter_cond} condensation reactions have been generated")
-        print(f"{self.counter_cll} condensation reactions have been generated")
+        print(f"{self.counter_cll} cleavage reactions have been generated")
         print()
-        if data["catalyzers"]["both_on"] == True:
+        if data["catalyzers"]["both_on"] == False:
             print("Condensation catalyzers for this chemical are: " )
             out = ""
             for catalyzer in data["catalyzers"]["eligible_cond_species"]:
@@ -154,6 +154,10 @@ class GeneratorIO(BaseIO):
             for catalyzer in data["catalyzers"]["eligible_cll_species"] + data["catalyzers"]["eligible_cond_species"]:
                 out += f"{catalyzer}\t"
             print(f'{out}\n')
+
+
+
+
 
 # Class to handle AutoTool input-output
 class AutoToolIO(BaseIO):

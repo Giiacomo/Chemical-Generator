@@ -24,11 +24,11 @@ CATALYZER_PARAMS
 #PRIMA RIGA = <range della lunghezza di una specie chimica per diventare catalizzatore, se non c'è limite non inserire nulla>
 #SECONDA RIGA = <numero di specie chimiche catalizzatrici di una classe di condensazioni>
 #TERZA RIGA = <numero di specie chimiche catalizzatrici di una classe di cleavage>
-#QUARTA RIGA = <catalizzatore di condensazione e cleavage: ON/OFF>
+#QUARTA RIGA = <catalizzatore di condensazione può esserlo anche di cleavage: ON/OFF>
 2,6
 3
 2
-ON
+OFF
 
 
 REACTIONS
