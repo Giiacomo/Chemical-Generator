@@ -8,6 +8,10 @@ The basic version of this chemical generator is implemented in the script `gener
 python3 generator.py <input-filename>.txt [-debug] [-o <output-filename>.txt]
 ```
 
+where:
+- **-debug** enables debug info printing
+- **-o <filename>** enables the choice of output file name
+
 The script executes in order the following functions:
 ```py
     parsed_data = parse_data_from_file(file_path)
