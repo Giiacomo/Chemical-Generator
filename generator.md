@@ -2,10 +2,10 @@
 
 ## Basic Version
 
-The basic version of this chemical generator is implemented in the script `basic_gen.py`. You can execute it using the following command:
+The basic version of this chemical generator is implemented in the script `generator.py`. You can execute it using the following command:
 
 ```sh
-python3 basic_gen.py <filename>.txt
+python3 generator.py <input-filename>.txt [-debug] [-o <output-filename>.txt]
 ```
 
 The script executes in order the following functions:
@@ -14,18 +14,19 @@ The script executes in order the following functions:
     parsed_data["catalyzers"] = generate_catalyzers(parsed_data)
     parsed_data["cond_reactions"] = generate_condensation_reactions(parsed_data)
     parsed_data["cll_reactions"] = generate_cleavage_reactions(parsed_data)
-    write_data_to_file(file_path=file_to_write, data=parsed_data)
+    generate_new_species(parsed_data)
+    generatorIO.write_data(parsed_data)
 ```
 
 At the end of the script execution, `parsed_data` takes the following structure:
 ```py
 {
 'species':  [[<nomespecie>, <concentrazione>, <contributo>]],
-'probs': [<prob_catalyzer>, <prob_cond>],  
+'catalyzer_params': [[<range>], <n_cond_catalyzers>, <n_cll_catalyzers>, <both_on>],  
 'reactions': {'conds': [<specie>], 'clls': [<specie>] },
 'catalyzers': {'cond': [<specie>], 'cll': [<specie>],
-               'cond_reactions': [<reactant_1>, <reactant_2>, <v>]
-               'cll_reactions': [<specie>, <cleavage_1>, <cleavage_2>, <v>]}
+               'cond_reactions': [<reactant_1>, <reactant_2>, <v>, [<catalyzers>]]
+               'cll_reactions': [<specie>, <cleavage_1>, <cleavage_2>, <v>, [<catalyzers>]]}
 }
 ```
 
@@ -54,12 +55,16 @@ BBBB    1.00E-15	1E-3
 AAAB    1.00E-15	1E-3
 AAB	    1.00E-15	1E-3
 
-PROBS
+CATALYZER_PARAMS
 #FORMA
-#PRIMA RIGA = <probabilità che una specie chimica diventi catalizzatore>
-#SECONDA RIGA = <probabilità che una reazione sia una condensazione>
-0.1 
-0.5
+#PRIMA RIGA = <range della lunghezza di una specie chimica per diventare catalizzatore, se non c'è limite non inserire nulla>
+#SECONDA RIGA = <numero di specie chimiche catalizzatrici di una classe di condensazioni>
+#TERZA RIGA = <numero di specie chimiche catalizzatrici di una classe di cleavage>
+#QUARTA RIGA = <catalizzatore di condensazione e cleavage: ON/OFF (both_on)>
+1,2
+3
+2
+ON
 
 REACTIONS
 #FORMA CONDS

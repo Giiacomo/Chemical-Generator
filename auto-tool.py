@@ -2,8 +2,7 @@ import sys
 from generator_io import AutoToolIO
 
 def generate_condensation_reactions(data):
-    # if len(data["catalyzers"]["cond"]) == 0:
-    #     return []
+
     
     species = data["species"]
     n_s, n_d, v = map(float, data["conds"])

@@ -1,0 +1,135 @@
+Cont 1.35E-16 0
+A 1.00E-15 0.
+B 1.00E-15 0.
+AB 1.00E-15 0.
+BA 1.00E-15 0.
+BB 1.00E-15 0.
+BABA 1.00E-15 1E-3
+AAA 1.00E-15 1E-3
+BBB 1.00E-15 0.
+BAB 1.00E-15 0.
+BBBB 1.00E-15 0.
+BABABA 1.00E-15 0.
+BABABB 1.00E-15 0.
+AAABABA 1.00E-15 0.
+ABBB 1.00E-15 0.
+BBAB 1.00E-15 0.
+BAAB 1.00E-15 0.
+BBBA 1.00E-15 0.
+ABABA 1.00E-15 0.
+ABA 1.00E-15 0.
+BABB 1.00E-15 0.
+BBA 1.00E-15 0.
+ABBABA 1.00E-15 0.
+ABAB 1.00E-15 0.
+ABB 1.00E-15 0.
+ABBA 1.00E-15 0.
+BBABA 1.00E-15 0.
+BABAAB 1.00E-15 0.
+AAABB 1.00E-15 0.
+BBBABA 1.00E-15 0.
+BABABABA 1.00E-15 0.
+AAABA 1.00E-15 0.
+AAAAB 1.00E-15 0.
+
+A + AB + BB > AAB + BB ; 0.2
+A + AB + A > AAB + A ; 0.2
+A + AB + AB > AAB + AB ; 0.2
+A + BA + BA > ABA + BA ; 0.2
+A + BA + B > ABA + B ; 0.2
+A + BA + BB > ABA + BB ; 0.2
+A + BB + AB > ABB + AB ; 0.2
+A + BB + B > ABB + B ; 0.2
+A + BB + BA > ABB + BA ; 0.2
+A + BABA + BA > ABABA + BA ; 0.2
+A + BABA + B > ABABA + B ; 0.2
+A + BABA + AB > ABABA + AB ; 0.2
+B + AB + BA > BAB + BA ; 0.2
+B + AB + A > BAB + A ; 0.2
+B + AB + B > BAB + B ; 0.2
+B + BA + AB > BBA + AB ; 0.2
+B + BA + BA > BBA + BA ; 0.2
+B + BA + BB > BBA + BB ; 0.2
+B + BB + AB > BBB + AB ; 0.2
+B + BB + B > BBB + B ; 0.2
+B + BB + BA > BBB + BA ; 0.2
+B + BABA + BA > BBABA + BA ; 0.2
+B + BABA + A > BBABA + A ; 0.2
+B + BABA + AB > BBABA + AB ; 0.2
+AB + AB + B > ABAB + B ; 0.2
+AB + AB + BB > ABAB + BB ; 0.2
+AB + AB + A > ABAB + A ; 0.2
+AB + BA + BA > ABBA + BA ; 0.2
+AB + BA + BB > ABBA + BB ; 0.2
+AB + BA + A > ABBA + A ; 0.2
+AB + BB + B > ABBB + B ; 0.2
+AB + BB + A > ABBB + A ; 0.2
+AB + BB + AB > ABBB + AB ; 0.2
+AB + BABA + A > ABBABA + A ; 0.2
+AB + BABA + BA > ABBABA + BA ; 0.2
+AB + BABA + BB > ABBABA + BB ; 0.2
+BA + AB + AB > BAAB + AB ; 0.2
+BA + AB + BA > BAAB + BA ; 0.2
+BA + AB + A > BAAB + A ; 0.2
+BA + BA + BB > BABA + BB ; 0.2
+BA + BA + AB > BABA + AB ; 0.2
+BA + BA + B > BABA + B ; 0.2
+BA + BB + A > BABB + A ; 0.2
+BA + BB + BB > BABB + BB ; 0.2
+BA + BB + BA > BABB + BA ; 0.2
+BA + BABA + B > BABABA + B ; 0.2
+BA + BABA + A > BABABA + A ; 0.2
+BA + BABA + BA > BABABA + BA ; 0.2
+BB + AB + A > BBAB + A ; 0.2
+BB + AB + B > BBAB + B ; 0.2
+BB + AB + AB > BBAB + AB ; 0.2
+BB + BA + A > BBBA + A ; 0.2
+BB + BA + AB > BBBA + AB ; 0.2
+BB + BA + B > BBBA + B ; 0.2
+BB + BB + B > BBBB + B ; 0.2
+BB + BB + BB > BBBB + BB ; 0.2
+BB + BB + BA > BBBB + BA ; 0.2
+BB + BABA + BA > BBBABA + BA ; 0.2
+BB + BABA + AB > BBBABA + AB ; 0.2
+BB + BABA + BB > BBBABA + BB ; 0.2
+BABA + AB + B > BABAAB + B ; 0.2
+BABA + AB + BB > BABAAB + BB ; 0.2
+BABA + AB + A > BABAAB + A ; 0.2
+BABA + BA + B > BABABA + B ; 0.2
+BABA + BA + A > BABABA + A ; 0.2
+BABA + BA + BB > BABABA + BB ; 0.2
+BABA + BB + BA > BABABB + BA ; 0.2
+BABA + BB + AB > BABABB + AB ; 0.2
+BABA + BB + A > BABABB + A ; 0.2
+BABA + BABA + BB > BABABABA + BB ; 0.2
+BABA + BABA + B > BABABABA + B ; 0.2
+BABA + BABA + A > BABABABA + A ; 0.2
+AAA + AB + AB > AAAAB + AB ; 0.2
+AAA + AB + B > AAAAB + B ; 0.2
+AAA + AB + BB > AAAAB + BB ; 0.2
+AAA + BA + BA > AAABA + BA ; 0.2
+AAA + BA + BB > AAABA + BB ; 0.2
+AAA + BA + B > AAABA + B ; 0.2
+AAA + BB + A > AAABB + A ; 0.2
+AAA + BB + B > AAABB + B ; 0.2
+AAA + BB + AB > AAABB + AB ; 0.2
+AAA + BABA + A > AAABABA + A ; 0.2
+AAA + BABA + B > AAABABA + B ; 0.2
+AAA + BABA + BB > AAABABA + BB ; 0.2
+
+AB + BA > A + B + BA ; 2.0
+AB + BB > A + B + BB ; 2.0
+BA + BA > B + A + BA ; 2.0
+BA + AB > B + A + AB ; 2.0
+BB + BA > B + B + BA ; 2.0
+BB + BB > B + B + BB ; 2.0
+BABA + B > B + ABA + B ; 2.0
+BABA + A > B + ABA + A ; 2.0
+BABA + A > BA + BA + A ; 2.0
+BABA + AB > BA + BA + AB ; 2.0
+BABA + BA > BAB + A + BA ; 2.0
+BABA + B > BAB + A + B ; 2.0
+AAA + BB > A + AA + BB ; 2.0
+AAA + B > A + AA + B ; 2.0
+AAA + B > AA + A + B ; 2.0
+AAA + BB > AA + A + BB ; 2.0

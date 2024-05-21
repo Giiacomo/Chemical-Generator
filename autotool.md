@@ -6,7 +6,7 @@ AutoTool is a tool designed to facilitate the generation of files based on input
 ### Species Format
 The input files for AutoTool have the following format:
 - chemical species, their concentrations, contributions to the membrane
-- probabilities for a specie of being a catalyzer for a condensation or a cleavage
+- parameters for condensation and cleavage catalyzers
 - conditions for condensation, conds speed
 - cleavage windows, clls speed
 
@@ -14,9 +14,11 @@ The input files for AutoTool have the following format:
 - Each species is represented by a symbol (e.g.: A, B, AA) along with its concentration and contribution to the membrane.
 - Comments can be added using '#' at the beginning of the line.
 
-#### Probabilities
-- prob_catalyzer specifies the probabilities associated with each species of being a catalyzer.
-- prob_cond specifies the probabilities associated with each species of being a cond catalyzer (1-prob_cond is the one for cleavages)
+#### Catalyzers Section
+- **first line**: range of the length of a chemical species to become a catalyst, if there is no limit do not include anything
+- **second line**:number of chemical species catalyzing a class of condensations
+- **third line**: number of chemical species catalyzing a class of cleavage
+- **fourth line**: catalyst for condensation and cleavage: ON/OFF
 
 #### Condensation Section
 - Allows users to define the number of symbols on the left (N_s) and right (N_d) sides for condensation reactions.
@@ -43,9 +45,11 @@ BBBB 1.00E-15 1E-3
 AAAB 1.00E-15 1E-3
 AAB 1.00E-15 1E-3
 
-PROBS
-0.1
-0.5
+CATALYZER_PARAMS
+1,2
+3
+2
+ON
 
 CONDS   
 1   2   0.2
