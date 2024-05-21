@@ -25,7 +25,7 @@ CATALYZER_PARAMS
 #SECONDA RIGA = <numero di specie chimiche catalizzatrici di una classe di condensazioni>
 #TERZA RIGA = <numero di specie chimiche catalizzatrici di una classe di cleavage>
 #QUARTA RIGA = <catalizzatore di condensazione e cleavage: ON/OFF>
-1,2
+2,6
 3
 2
 ON
