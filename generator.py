@@ -16,44 +16,45 @@ def generate_catalyzers(data):
 
     if len(eligible_species) < (num_cond_catalyzers + num_cll_catalyzers):
         raise ValueError("Error! Not enough eligible species to satisfy the catalyzer requirements.")
+        
+    catalyzers = {
+        'eligible_cond_species': [],
+        'eligible_cll_species': [],
+        'both_on': both_on,
+        'num_cond_catalyzers': num_cond_catalyzers,
+        'num_cll_catalyzers': num_cll_catalyzers
+    }
 
-    random.shuffle(eligible_species)
-    cond_catalyzers = eligible_species[:num_cond_catalyzers]
-    cll_catalyzers = eligible_species[num_cond_catalyzers:num_cond_catalyzers + num_cll_catalyzers]
-    remaining_species = eligible_species[num_cond_catalyzers + num_cll_catalyzers:]
+    for _ in range(num_cond_catalyzers):
+        catalyzers['eligible_cond_species'].append(random.choice(eligible_species))
 
-    for specie in remaining_species:
-        if random.choice([True, False]):
-            cond_catalyzers.append(specie)
-        else:
-            cll_catalyzers.append(specie)
-
-    catalyzers = {'eligible_cond_species': cond_catalyzers, 'eligible_cll_species': cll_catalyzers, 
-                  'both_on': both_on, 'num_cond_catalyzers': num_cond_catalyzers, 'num_cll_catalyzers': num_cll_catalyzers}
+    for _ in range(num_cll_catalyzers):
+        catalyzers['eligible_cll_species'].append(random.choice(eligible_species))
 
     return catalyzers
 
 def get_reaction_catalyzer(catalyzers, reaction_type):
-    eligible_cond_species = catalyzers['eligible_cond_species']
-    eligible_cll_species = catalyzers['eligible_cll_species']
     both_on = catalyzers['both_on']
-    num_cond_catalyzers = catalyzers['num_cond_catalyzers']
-    num_cll_catalyzers = catalyzers['num_cll_catalyzers']
     
     if reaction_type == "condensation":
+        num_catalyzers = random.randint(1, catalyzers['num_cond_catalyzers'])
         if both_on:
-            catalyzers = random.sample(eligible_cond_species + eligible_cll_species, num_cond_catalyzers)
+            all_species = catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species']
+            catalyzers_list = random.sample(all_species, num_catalyzers)
         else:
-            catalyzers = random.sample(eligible_cond_species, num_cond_catalyzers)
+            catalyzers_list = random.sample(catalyzers['eligible_cond_species'], num_catalyzers)
     elif reaction_type == "cleavage":
+        num_catalyzers = random.randint(1, catalyzers['num_cll_catalyzers'])
         if both_on:
-            catalyzers = random.sample(eligible_cond_species + eligible_cll_species, num_cll_catalyzers)
+            all_species = catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species']
+            catalyzers_list = random.sample(all_species, num_catalyzers)
         else:
-            catalyzers = random.sample(eligible_cll_species, num_cll_catalyzers)
+            catalyzers_list = random.sample(catalyzers['eligible_cll_species'], num_catalyzers)
     else:
         raise ValueError("Invalid reaction type. It should be 'condensation' or 'cleavage'.")
     
-    return catalyzers
+    return catalyzers_list
+
 
 def generate_condensation_reactions(data):
     species = data["species"][1:]
