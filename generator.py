@@ -3,20 +3,52 @@ import random
 import argparse
 from generator_io import GeneratorIO
 
+def assign_catalyzers(num_catalyzers, eligible_species, reactions):
+    catalyzer_list = []
+    species_pool = eligible_species[:]
+
+        # Ensure at least one catalyzer for each reaction
+    for reaction in reactions:
+        if not species_pool:
+            raise ValueError("Error! Not enough unique species to cover all required catalyzers.")
+
+        chosen = random.choice(species_pool)
+        catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
+        species_pool.remove(chosen)
+
+        # Assign remaining catalyzers
+    while len(catalyzer_list) < num_catalyzers:
+        if not species_pool:
+            species_pool = eligible_species[:]
+            
+        chosen = random.choice(species_pool)
+        available_reactions = [reaction for reaction in reactions if any(c['reaction'] == reaction for c in catalyzer_list)]
+            
+        if not available_reactions:
+            continue
+
+        chosen_reaction = random.choice(available_reactions)
+        catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': chosen_reaction})
+
+    return catalyzer_list
+
 def generate_catalyzers(data):
     catalyzer_params = data["catalyzer_params"]
     species = data["species"]
+    cond_reactions = [tuple(r) for r in data["reactions"]["conds"]]
+    cll_reactions = [tuple(r) for r in data["reactions"]["clls"]]
 
     min_length, max_length = catalyzer_params[0]
     num_cond_catalyzers = catalyzer_params[1]
     num_cll_catalyzers = catalyzer_params[2]
     both_on = catalyzer_params[3] == 'ON'
 
+    #Scelgo le specie che rispettano il criterio
     eligible_species = [specie[0] for specie in species[1:] if min_length <= len(specie[0]) <= max_length]
-
+    #Se i potenziali catalizzatori sono meno di quelli richiesti da errore
     if len(eligible_species) < (num_cond_catalyzers + num_cll_catalyzers):
         raise ValueError("Error! Not enough eligible species to satisfy the catalyzer requirements.")
-        
+    
     catalyzers = {
         'eligible_cond_species': [],
         'eligible_cll_species': [],
@@ -25,37 +57,22 @@ def generate_catalyzers(data):
         'num_cll_catalyzers': num_cll_catalyzers
     }
 
-    for _ in range(num_cond_catalyzers):
-        catalyzers['eligible_cond_species'].append(random.choice(eligible_species))
+    catalyzers['eligible_cond_species'] = assign_catalyzers(num_cond_catalyzers, eligible_species, cond_reactions)
 
-    for _ in range(num_cll_catalyzers):
-        catalyzers['eligible_cll_species'].append(random.choice(eligible_species))
+    if both_on:
+        cll_candidates = eligible_species
+    else:
+        cll_candidates = [s for s in eligible_species if s not in [c['catalyzer_specie'] for c in catalyzers['eligible_cond_species']]]
+
+    catalyzers['eligible_cll_species'] = assign_catalyzers(num_cll_catalyzers, cll_candidates, cll_reactions)
 
     return catalyzers
 
-def get_reaction_catalyzer(catalyzers, reaction_type):
-    both_on = catalyzers['both_on']
-    
-    if reaction_type == "condensation":
-        num_catalyzers = random.randint(1, catalyzers['num_cond_catalyzers'])
-        if both_on:
-            all_species = catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species']
-            catalyzers_list = random.sample(all_species, num_catalyzers)
-        else:
-            catalyzers_list = random.sample(catalyzers['eligible_cond_species'], num_catalyzers)
-    elif reaction_type == "cleavage":
-        num_catalyzers = random.randint(1, catalyzers['num_cll_catalyzers'])
-        if both_on:
-            all_species = catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species']
-            catalyzers_list = random.sample(all_species, num_catalyzers)
-        else:
-            catalyzers_list = random.sample(catalyzers['eligible_cll_species'], num_catalyzers)
-    else:
-        raise ValueError("Invalid reaction type. It should be 'condensation' or 'cleavage'.")
-    
-    return catalyzers_list
+def get_reaction_catalyzer(catalyzers, reaction):
+    reaction_tuple = tuple(reaction)
+    return [c for c in catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
 
-
+    
 def generate_condensation_reactions(data):
     species = data["species"][1:]
     reactions = data["reactions"]["conds"]
@@ -69,7 +86,7 @@ def generate_condensation_reactions(data):
             for reaction in reactions:
                 if reagent_1.endswith(reaction[0]) and reagent_2.startswith(reaction[1]):
                     new_reaction = [reagent_1 + reagent_2, reagent_1, reagent_2, reaction[2]]
-                    catalyzer = get_reaction_catalyzer(data["catalyzers"], "condensation") 
+                    catalyzer = get_reaction_catalyzer(data["catalyzers"], reaction) 
                     new_reaction.append(catalyzer)
                     condensation_reactions.append(new_reaction)
 
@@ -89,7 +106,7 @@ def generate_cleavage_reactions(catalyzers, species, reactions):
                 reactant_half_length = reactant_length // 2
                 if cleavage_1.endswith(reactant[:reactant_half_length]) and cleavage_2.startswith(reactant[reactant_half_length:]): 
                     new_reaction = [specie_name, cleavage_1, cleavage_2, reaction[1]]
-                    catalyzer = get_reaction_catalyzer(catalyzers, "cleavage")
+                    catalyzer = get_reaction_catalyzer(catalyzers, reaction)
                     new_reaction.append(catalyzer)
                     cleavage_reactions.append(new_reaction)
 

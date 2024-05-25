@@ -110,7 +110,7 @@ class GeneratorIO(BaseIO):
             self.counter_cond = 0
             for r in data["cond_reactions"]:  
                 for catalyzer in r[4]:
-                    file.write(r[1] + " + " + r[2] + " + " + catalyzer + " > " + r[0] + " + " + catalyzer + " ; " + r[3] + "\n")
+                    file.write(r[1] + " + " + r[2] + " + " + catalyzer['catalyzer_specie'] + " > " + r[0] + " + " + catalyzer['catalyzer_specie'] + " ; " + r[3] + "\n")
                     self.counter_cond += 1
 
             file.write("\n")
@@ -118,7 +118,7 @@ class GeneratorIO(BaseIO):
             self.counter_cll = 0
             for r in data["cll_reactions"]:
                 for catalyzer in r[4]:
-                    file.write(r[0] + " + " + catalyzer + " > " + r[1] + " + " + r[2] + " + " + catalyzer + " ; " + r[3] + "\n")
+                    file.write(r[0] + " + " + catalyzer['catalyzer_specie'] + " > " + r[1] + " + " + r[2] + " + " + catalyzer['catalyzer_specie'] + " ; " + r[3] + "\n")
                     self.counter_cll += 1
 
             #Debug info
@@ -135,26 +135,28 @@ class GeneratorIO(BaseIO):
         print(f"{self.counter_cond} condensation reactions have been generated")
         print(f"{self.counter_cll} cleavage reactions have been generated")
         print()
-        if data["catalyzers"]["both_on"] == False:
-            print("Condensation catalyzers for this chemical are: " )
-            out = ""
-            for catalyzer in data["catalyzers"]["eligible_cond_species"]:
-                out += f"{catalyzer}\t"
-            print(f'{out}\n')
+        print("Condensation catalyzers for this chemical are: " )
+        out = ""
+        for catalyzer in data["catalyzers"]["eligible_cond_species"]:
+            out += f"{catalyzer['catalyzer_specie']}\t"
+        print(f'{out}\n')
 
-            print("Cleavage catalyzers for this chemical are: " )
-            out = ""
-            for catalyzer in data["catalyzers"]["eligible_cll_species"]:
-                out += f"{catalyzer}\t"
-            print(f'{out}\n')
-        else: 
-            print("Catalyzers for this chemical are: " )
+        print("Cleavage catalyzers for this chemical are: " )
+        out = ""
+        for catalyzer in data["catalyzers"]["eligible_cll_species"]:
+            out += f"{catalyzer['catalyzer_specie']}\t"
+        print(f'{out}\n')
 
-            out = ""
-            for catalyzer in data["catalyzers"]["eligible_cll_species"] + data["catalyzers"]["eligible_cond_species"]:
-                out += f"{catalyzer}\t"
-            print(f'{out}\n')
+        print("Assigned reactions for each catalyzer:")
+        print("Condensation reactions:")
+        for catalyzer in data["catalyzers"]["eligible_cond_species"]:
+            reaction = catalyzer['reaction']
+            print(f"{catalyzer['catalyzer_specie']} is assigned to reaction:\t R-{reaction[0]} + {reaction[1]}-R")
 
+        print("\nCleavage reactions:")
+        for catalyzer in data["catalyzers"]["eligible_cll_species"]:
+            reaction = catalyzer['reaction']
+            print(f"{catalyzer['catalyzer_specie']} is assigned to reaction:\t R-{reaction[0]}-R")
 
 
 
