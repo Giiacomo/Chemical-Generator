@@ -28,9 +28,9 @@ At the end of the script execution, `parsed_data` takes the following structure:
 'species':  [[<nomespecie>, <concentrazione>, <contributo>]],
 'catalyzer_params': [[<range>], <n_cond_catalyzers>, <n_cll_catalyzers>, <both_on>],  
 'reactions': {'conds': [<specie>], 'clls': [<specie>] },
-'catalyzers': {'cond': [<specie>], 'cll': [<specie>],
-               'cond_reactions': [<reactant_1>, <reactant_2>, <v>, [<catalyzers>]]
-               'cll_reactions': [<specie>, <cleavage_1>, <cleavage_2>, <v>, [<catalyzers>]]}
+'catalyzers': {'cond': [<specie>], 'cll': [<specie>] },
+'cond_reactions': [<reactant_1>, <reactant_2>, <v>, [<catalyzers>]]
+'cll_reactions': [<specie>, <cleavage_1>, <cleavage_2>, <v>, [<catalyzers>]]
 }
 ```
 
