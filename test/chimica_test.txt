@@ -27,7 +27,7 @@ CATALYZER_PARAMS
 #QUARTA RIGA = <catalizzatore di condensazione può esserlo anche di cleavage: ON/OFF>
 2,6
 4
-2
+3
 ON
 
 
