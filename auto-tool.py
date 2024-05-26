@@ -4,7 +4,7 @@ from generator_io import AutoToolIO
 def generate_condensation_reactions(data):
 
     
-    species = data["species"]
+    species = data["species"][1:]
     n_s, n_d, v = map(float, data["conds"])
     condensation_reactions = {'reactions': [], 'v': v}
     for i in range(len(species)):
@@ -19,7 +19,7 @@ def generate_condensation_reactions(data):
 
 def generate_cleavage_reactions(data):
 
-    species = data["species"]
+    species = data["species"][1:]
     Nts = list(map(int, [nt for nt in data["clls"][0]]))
     v = float(data["conds"][1])
     cleavage_reactions = {'reactions': [], 'v': v}

@@ -9,7 +9,7 @@ BABA 1.00E-15 1E-3
 AAA 1.00E-15 1E-3
 
 CATALYZER_PARAMS
-1,2
+2,6
 3
 2
 ON
@@ -22,10 +22,7 @@ R-B	AB-R	0.2
 R-B	BA-R	0.2
 R-B	BB-R	0.2
 
-R-AA-R	2.0
-R-nt-R	2.0
-R-on-R	2.0
-R-BB-R	2.0
 R-BA-R	2.0
 R-AB-R	2.0
-R-Co-R	2.0
+R-AA-R	2.0
+R-BB-R	2.0

@@ -2,23 +2,35 @@ import sys
 import random
 import argparse
 from generator_io import GeneratorIO
-
 ## Domanda su meno catalizzatori rispetto a reazioni
-
 def assign_catalyzers(num_catalyzers, eligible_species, reactions):
     catalyzer_list = []
+    species_pool = eligible_species[:]
 
-    # Ensure at least one catalyzer for each reaction
-    for reaction in reactions:
-
-        chosen = random.choice(eligible_species)
-        catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
+    # Ensure at least one catalyzer for each reaction if there are enough species
+    if num_catalyzers > len(reactions):
+        for reaction in reactions:
+            if not species_pool:
+                raise ValueError("Error! Not enough unique species to cover all required catalyzers.")
+            chosen = random.choice(species_pool)
+            catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
+            species_pool.remove(chosen)
+    else:
+        assigned_reactions = random.sample(reactions, num_catalyzers)
+        for reaction in assigned_reactions:
+            if not species_pool:
+                species_pool = eligible_species[:]
+            chosen = random.choice(species_pool)
+            catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
+            species_pool.remove(chosen)
 
     # Assign remaining catalyzers
     while len(catalyzer_list) < num_catalyzers:
-
-        chosen = random.choice(eligible_species)
-        available_reactions = [r for r in reactions if not any(c['reaction'] == r and c['catalyzer_specie'] == chosen for c in catalyzer_list)]
+        if not species_pool:
+            species_pool = eligible_species[:]
+            
+        chosen = random.choice(species_pool)
+        available_reactions = [reaction for reaction in reactions if any(c['reaction'] == reaction for c in catalyzer_list)]
         
         if not available_reactions:
             continue
@@ -63,11 +75,6 @@ def generate_catalyzers(data):
     catalyzers['eligible_cll_species'] = assign_catalyzers(num_cll_catalyzers, cll_candidates, cll_reactions)
 
     return catalyzers
-
-def get_reaction_catalyzer(catalyzers, reaction):
-    reaction_tuple = tuple(reaction)
-    return [c for c in catalyzers['eligible_cond_species'] + catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
-
 
 def get_reaction_catalyzer(catalyzers, reaction):
     reaction_tuple = tuple(reaction)
