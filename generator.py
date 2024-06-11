@@ -162,6 +162,26 @@ def generate_new_species(data):
 
     return new_species
 
+def eliminate_duplicates(reactions):
+    reaction_dict = {}
+    
+    for reaction in reactions:
+        # Remove catalyzer
+        reagents_products = (reaction[1], reaction[2], reaction[0])
+        reagents_products = tuple(sorted(reagents_products[:2])) + (reagents_products[2],)
+        
+        if reagents_products not in reaction_dict:
+            reaction_dict[reagents_products] = [reaction]
+        else:
+            reaction_dict[reagents_products].append(reaction)
+    
+    unique_reactions = []
+    for key in reaction_dict:
+        unique_reactions.append(random.choice(reaction_dict[key]))
+    
+    return unique_reactions
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate species and reactions.")
     parser.add_argument("file_path", help="The path to the input file.")
@@ -181,6 +201,12 @@ if __name__ == "__main__":
         parsed_data["cll_reactions"] = generate_cleavage_reactions(parsed_data["catalyzers"],
                                                                    parsed_data["species"],
                                                                    parsed_data["reactions"]["clls"])
+        
+        
+        parsed_data["cond_reactions"] = eliminate_duplicates(parsed_data["cond_reactions"])
+        parsed_data["cll_reactions"] = eliminate_duplicates(parsed_data["cll_reactions"])
+
+
         generate_new_species(parsed_data)
         generatorIO.write_data(parsed_data)
     except Exception as e:
