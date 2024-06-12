@@ -141,11 +141,12 @@ def generate_cleavage_reactions(catalyzers, species, reactions):
 def generate_new_species(data):
     new_species = data["cond_reactions"]
     cleavage_products = []
-
+    print(new_species)
     while True:
         new_cleavage_products = generate_cleavage_reactions(data["catalyzers"], 
                                                             new_species, 
                                                             data["reactions"]["clls"])
+        
         cleavage_products.extend(new_cleavage_products)
 
         new_species_copy = data["species"]
@@ -162,7 +163,7 @@ def generate_new_species(data):
 
     return new_species
 
-def eliminate_duplicates(reactions):
+def eliminate_duplicate_reactions(reactions):
     reaction_dict = {}
     
     for reaction in reactions:
@@ -198,13 +199,14 @@ if __name__ == "__main__":
         parsed_data = generatorIO.parse_data()
         parsed_data["catalyzers"] = generate_catalyzers(parsed_data)
         parsed_data["cond_reactions"] = generate_condensation_reactions(parsed_data)
+        print(parsed_data["species"])
         parsed_data["cll_reactions"] = generate_cleavage_reactions(parsed_data["catalyzers"],
                                                                    parsed_data["species"],
                                                                    parsed_data["reactions"]["clls"])
         
         
-        parsed_data["cond_reactions"] = eliminate_duplicates(parsed_data["cond_reactions"])
-        parsed_data["cll_reactions"] = eliminate_duplicates(parsed_data["cll_reactions"])
+        parsed_data["cond_reactions"] = eliminate_duplicate_reactions(parsed_data["cond_reactions"])
+        parsed_data["cll_reactions"] = eliminate_duplicate_reactions(parsed_data["cll_reactions"])
 
 
         generate_new_species(parsed_data)
