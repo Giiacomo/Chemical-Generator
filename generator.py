@@ -2,12 +2,11 @@ import sys
 import random
 import argparse
 from generator_io import GeneratorIO
-## Domanda su meno catalizzatori rispetto a reazioni
+
 def assign_catalyzers(num_catalyzers, eligible_species, reactions):
     catalyzer_list = []
     species_pool = eligible_species[:]
 
-    # Ensure at least one catalyzer for each reaction if there are enough species
     if num_catalyzers > len(reactions):
         for reaction in reactions:
             if not species_pool:
@@ -24,7 +23,6 @@ def assign_catalyzers(num_catalyzers, eligible_species, reactions):
             catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
             species_pool.remove(chosen)
 
-    # Assign remaining catalyzers
     while len(catalyzer_list) < num_catalyzers:
         if not species_pool:
             species_pool = eligible_species[:]
@@ -121,8 +119,9 @@ def generate_condensation_reactions(data):
 def generate_cleavage_reactions(catalyzers, species, reactions):
     cleavage_reactions = []
 
-    for specie in species[1:]:
-        specie_name = specie[0]
+    species = [specie for specie in species if specie != "Cont"]
+
+    for specie_name in species:
         for i in range(1, len(specie_name)):
             cleavage_1 = specie_name[:i]
             cleavage_2 = specie_name[i:]
@@ -138,20 +137,30 @@ def generate_cleavage_reactions(catalyzers, species, reactions):
 
     return cleavage_reactions
 
+
 def generate_new_species(data):
-    new_species = data["cond_reactions"]
+    cond_species = {reaction[0] for reaction in data["cond_reactions"]}
+    cll_species = {product for reaction in data["cll_reactions"] for product in reaction[1:3]}
+    
+    new_species = list(cond_species | cll_species)
+    
     cleavage_products = []
-    print(new_species)
+
     while True:
-        new_cleavage_products = generate_cleavage_reactions(data["catalyzers"], 
-                                                            new_species, 
-                                                            data["reactions"]["clls"])
+        new_cleavage_products = generate_cleavage_reactions(
+            data["catalyzers"], 
+            new_species, 
+            data["reactions"]["clls"]
+        )
         
         cleavage_products.extend(new_cleavage_products)
-
+        
         new_species_copy = data["species"]
-
-        cleavage_products = [product for product in cleavage_products if product[0] not in [species[0] for species in data["species"]]]
+        
+        cleavage_products = [
+            product for product in cleavage_products 
+            if product[0] not in {species[0] for species in data["species"]}
+        ]
         
         new_species_to_add = list(set((product[0], '1.00E-15', '0.') for product in cleavage_products))
         new_species_to_add = [list(item) for item in new_species_to_add]
@@ -167,7 +176,6 @@ def eliminate_duplicate_reactions(reactions):
     reaction_dict = {}
     
     for reaction in reactions:
-        # Remove catalyzer
         reagents_products = (reaction[1], reaction[2], reaction[0])
         reagents_products = tuple(sorted(reagents_products[:2])) + (reagents_products[2],)
         
@@ -199,11 +207,10 @@ if __name__ == "__main__":
         parsed_data = generatorIO.parse_data()
         parsed_data["catalyzers"] = generate_catalyzers(parsed_data)
         parsed_data["cond_reactions"] = generate_condensation_reactions(parsed_data)
-        print(parsed_data["species"])
+        species_names = [specie[0] for specie in parsed_data["species"]]
         parsed_data["cll_reactions"] = generate_cleavage_reactions(parsed_data["catalyzers"],
-                                                                   parsed_data["species"],
-                                                                   parsed_data["reactions"]["clls"])
-        
+                                                           species_names,
+                                                           parsed_data["reactions"]["clls"])
         
         parsed_data["cond_reactions"] = eliminate_duplicate_reactions(parsed_data["cond_reactions"])
         parsed_data["cll_reactions"] = eliminate_duplicate_reactions(parsed_data["cll_reactions"])
