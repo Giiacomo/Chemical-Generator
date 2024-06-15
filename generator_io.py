@@ -209,7 +209,6 @@ class AutoToolIO(BaseIO):
             file.write("SPECIES\n")
             for specie in data["species"]:
                 file.write(" ".join(specie) + "\n")
-            print(data["catalyzer_params"])
 
             file.write("\nCATALYZER_PARAMS\n")
             first_cata_line = ",".join(map(str, data['catalyzer_params'][0]))
@@ -226,4 +225,4 @@ class AutoToolIO(BaseIO):
 
             for r in data["gen-clls"]["reactions"]:
                 file.write(f'R-{r}-R\t{data["gen-clls"]["v"]}\n')
-            print(f"The chemical {self.output_file} has been generated and is ready to be used as input to the actual chemical generator!")
+            print(f"\nThe chemical {self.output_file} has been generated and is ready to be used as input to the actual chemical generator!\n")
