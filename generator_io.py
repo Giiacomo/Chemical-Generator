@@ -3,7 +3,7 @@ import sys
 class BaseIO:
     def __init__(self, file_path):
         self.input_file = file_path
-        self.output_file = file_path.replace(".txt", "") + "_generated.txt"
+        self.output_file = file_path.replace(".txt", "") + "_output.txt"
 
     def parse_data(self):
         data = {}

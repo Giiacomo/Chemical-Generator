@@ -1,10 +1,10 @@
-## AutoTool Documentation
+## GenTool Documentation
 
 ### Introduction
-AutoTool is a tool designed to facilitate the generation of files based on input data of a particular format (example at the end of this file). These files serve as inputs to the `basic_gen` generator.
+GenTool is a tool designed to facilitate the generation of files based on input data of a particular format (example at the end of this file). These files serve as inputs to the `basic_gen` generator.
 
 ### Species Format
-The input files for AutoTool have the following format:
+The input files for GenTool have the following format:
 - chemical species, their concentrations, contributions to the membrane
 - parameters for condensation and cleavage catalyzers
 - conditions for condensation, conds speed
