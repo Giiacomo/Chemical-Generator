@@ -130,19 +130,18 @@ class GeneratorIO(BaseIO):
 
             #Debug info
             if self.debug:
+                self.print_info(data)
                 file.write("\n")
                 file.write("# Debug Summary:\n")
-                file.write(f"# Total species lines written: {counter_species}\n")
+                file.write(f"# Total species lines written: {self.new_species_count}\n")
                 file.write(f"# Total cond reaction lines written: {self.counter_cond}\n")
                 file.write(f"# Total cll reaction lines written: {self.counter_cll}\n")
-
-                self.print_info(data)
     
     def print_info(self, data):
         print("The chemical file has been generated. Here's some info!")
 
-        new_species_count = len(data["species"]) - self.initial_species_count
-        print(f"{new_species_count} new species have been generated:")
+        self.new_species_count = len(data["species"]) - self.initial_species_count
+        print(f"{self.new_species_count} new species have been generated:")
         print(", ".join([species[0] for species in data["species"][self.initial_species_count:]]))
         print()
         print(f"{self.counter_cond} condensation reactions have been generated")
