@@ -17,10 +17,7 @@ ON
 REACTIONS
 R-A	AB-R	0.2
 R-A	BA-R	0.2
-R-A	BB-R	0.2
-R-B	AB-R	0.2
-R-B	BA-R	0.2
-R-B	BB-R	0.2
+
 
 R-AA-R	2.0
 R-BB-R	2.0

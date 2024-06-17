@@ -6,52 +6,40 @@ BA      	1.00E-15	0.
 BB      	1.00E-15	0.  
 BABA    	1.00E-15	1E-3
 AAA     	1.00E-15	1E-3
-BBAB    	1.00E-15	0.  
-BAB     	1.00E-15	0.  
-ABBABA  	1.00E-15	0.  
-BABABA  	1.00E-15	0.  
-ABA     	1.00E-15	0.  
-BBB     	1.00E-15	0.  
-BABAAB  	1.00E-15	0.  
-AAABA   	1.00E-15	0.  
-BABB    	1.00E-15	0.  
+BABABABA	1.00E-15	0.  
 AA      	1.00E-15	0.  
 ABABA   	1.00E-15	0.  
-BABABABA	1.00E-15	0.  
-BBA     	1.00E-15	0.  
-AAB     	1.00E-15	0.  
-BBBA    	1.00E-15	0.  
-ABBB    	1.00E-15	0.  
-BBBB    	1.00E-15	0.  
-BBABA   	1.00E-15	0.  
-AAAAB   	1.00E-15	0.  
-BBBABA  	1.00E-15	0.  
-ABBA    	1.00E-15	0.  
-AAABABA 	1.00E-15	0.  
-ABB     	1.00E-15	0.  
-BABABB  	1.00E-15	0.  
-AAABB   	1.00E-15	0.  
 BAAB    	1.00E-15	0.  
-ABAB    	1.00E-15	0.  
+AAB     	1.00E-15	0.  
+BAB     	1.00E-15	0.  
+ABA     	1.00E-15	0.  
+AAAAB   	1.00E-15	0.  
+AAABABA 	1.00E-15	0.  
+BABABA  	1.00E-15	0.  
+AAABA   	1.00E-15	0.  
+BABAAB  	1.00E-15	0.  
 
-A + BB + BABA > ABB + BABA ; 0.2
-B + BA + BB > BBA + BB ; 0.2
-B + BB + AAA > BBB + AAA ; 0.2
-B + BABA + BB > BBABA + BB ; 0.2
-AB + BA + BB > ABBA + BB ; 0.2
-AB + BB + AAA > ABBB + AAA ; 0.2
-AB + BABA + BB > ABBABA + BB ; 0.2
-BA + BB + BABA > BABB + BABA ; 0.2
-BB + BA + BB > BBBA + BB ; 0.2
-BB + BB + AAA > BBBB + AAA ; 0.2
-BB + BABA + BB > BBBABA + BB ; 0.2
-BABA + BB + BABA > BABABB + BABA ; 0.2
-AAA + BB + BABA > AAABB + BABA ; 0.2
+A + AB + AAA > AAB + AAA ; 0.2
+A + AB + BB > AAB + BB ; 0.2
+A + BA + BABA > ABA + BABA ; 0.2
+A + BABA + BABA > ABABA + BABA ; 0.2
+BA + AB + AAA > BAAB + AAA ; 0.2
+BA + AB + BB > BAAB + BB ; 0.2
+BA + BA + BABA > BABA + BABA ; 0.2
+BABA + BA + BABA > BABABA + BABA ; 0.2
+BABA + AB + AAA > BABAAB + AAA ; 0.2
+BABA + AB + BB > BABAAB + BB ; 0.2
+BABA + BABA + BABA > BABABABA + BABA ; 0.2
+AAA + AB + AAA > AAAAB + AAA ; 0.2
+AAA + AB + BB > AAAAB + BB ; 0.2
+AAA + BA + BABA > AAABA + BABA ; 0.2
+AAA + BABA + BABA > AAABABA + BABA ; 0.2
 
-BB + BA > B + B + BA ; 2.0
+AB + BB > A + B + BB ; 2.0
+BABA + BB > BA + BA + BB ; 2.0
 AAA + BABA > A + AA + BABA ; 2.0
 
 # Debug Summary:
-# Total species lines written: 27
-# Total cond reaction lines written: 13
-# Total cll reaction lines written: 2
+# Total species lines written: 12
+# Total cond reaction lines written: 15
+# Total cll reaction lines written: 3

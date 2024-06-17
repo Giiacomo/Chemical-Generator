@@ -1,6 +1,7 @@
 # Chemical Generator
 
-## Basic Version
+
+## Usage 🚀
 
 The basic version of this chemical generator is implemented in the script `generator.py`. You can execute it using the following command:
 
@@ -35,7 +36,7 @@ At the end of the script execution, `parsed_data` takes the following structure:
 ```
 
 
-## Usage Example
+### Usage Example ✏️
 
 ```
 SPECIES
@@ -84,3 +85,5 @@ R-BA    AB-R    0.2
 R-AB-R  0.3
 R-BB-R  0.5
 ```
+
+## Dev Notes 🛠️
