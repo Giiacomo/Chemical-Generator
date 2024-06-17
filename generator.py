@@ -84,8 +84,8 @@ class ReactionGenerator:
         reaction_tuple = tuple(reaction)
         return [c for c in self.catalyzers['eligible_cond_species'] + self.catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
 
-    def generate_condensation_reactions(self):
-        species = self.species[1:]
+    def generate_condensation_reactions(self, species):
+        species = species[1:]
         reactions = self.reactions["conds"]
         condensation_reactions = []
 
@@ -103,8 +103,7 @@ class ReactionGenerator:
 
         return condensation_reactions
 
-    def generate_cleavage_reactions(self):
-        species = [specie[0] for specie in self.species[1:]]
+    def generate_cleavage_reactions(self, species):
         reactions = self.reactions["clls"]
         cleavage_reactions = []
 
@@ -126,13 +125,49 @@ class ReactionGenerator:
 
         return cleavage_reactions
 
-    def generate_new_species(self, cond_reactions, cll_reactions):
-        cond_species = {reaction[0] for reaction in cond_reactions}
-        cll_species = {product for reaction in cll_reactions for product in reaction[1:3]}
-        
-        new_species = list(cond_species | cll_species)
 
-        return new_species
+    def generate_new_species(self):
+        cond_species = {reaction[0] for reaction in self.cond_reactions}
+        cll_species = {product for reaction in self.cll_reactions for product in reaction[1:3]}
+        new_species = list(cond_species | cll_species)
+        cleavage_products = []
+        
+        current_species_set = {species[0] for species in self.species}
+    
+        while True:
+            new_cleavage_products = self.generate_cleavage_reactions(new_species)
+            print(new_cleavage_products)
+            cleavage_products.extend(new_cleavage_products)
+
+            new_species_set = {product[1] for product in cleavage_products}
+            new_species_set.update({product[2] for product in cleavage_products})
+            # Filter out species that are already in the current set
+            new_species_to_add = [
+                product for product in new_species_set
+                if product not in current_species_set
+            ]
+
+            if not new_species_to_add:
+                break
+
+            new_species_to_add_formatted = [[specie, '1.00E-15', '0.'] for specie in new_species_to_add]
+
+            self.species.extend(new_species_to_add_formatted)
+            current_species_set.update(new_species_to_add)
+
+            # Add new cleavage reactions for the newly generated species
+            new_cleavage_reactions = self.generate_cleavage_reactions(new_species_to_add)
+            self.cll_reactions.extend(new_cleavage_reactions)
+            print()
+            print("TEST")
+            print(new_species)
+            print()
+            new_species.extend([specie[0] for specie in new_species_to_add])
+            print()
+            print(new_species)
+            print()
+
+        return current_species_set
 
     def eliminate_duplicate_reactions(self, reactions):
         reaction_dict = {}
@@ -154,17 +189,13 @@ class ReactionGenerator:
 
     def run_generation(self):
         self.generate_catalyzers()
-        self.cond_reactions = self.generate_condensation_reactions()
-        self.cll_reactions = self.generate_cleavage_reactions()
+        self.cond_reactions = self.generate_condensation_reactions(self.species)
+        self.cll_reactions = self.generate_cleavage_reactions([specie[0] for specie in self.species[1:]])
 
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
         self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
-
-        new_species = self.generate_new_species(self.cond_reactions, self.cll_reactions)
-        current_species = {specie[0] for specie in self.species}
-        for species in new_species:
-            if species not in current_species:
-                self.species.append([species, '1.00E-15', '0.'])
+        
+        self.generate_new_species()
 
         generated_data = {
             "catalyzers": self.catalyzers,

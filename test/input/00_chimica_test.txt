@@ -18,6 +18,8 @@ BAB	    1.00E-15	1E-3
 BBBB    1.00E-15	1E-3
 AAAB    1.00E-15	1E-3
 AAB	    1.00E-15	1E-3
+AABAB	1.00E-15	1E-3
+AAAAB	1.00E-15	1E-3
 
 CATALYZER_PARAMS
 #FORMA
@@ -26,7 +28,7 @@ CATALYZER_PARAMS
 #TERZA RIGA = <numero di specie chimiche catalizzatrici di una classe di cleavage>
 #QUARTA RIGA = <catalizzatore di condensazione può esserlo anche di cleavage: ON/OFF>
 2,6
-1
+3
 3
 ON
 
@@ -44,3 +46,4 @@ R-BA    AB-R    0.2
 #V_i = <velocità associata alla condensazione>
 R-AB-R  0.3
 R-BB-R  0.5
+R-AA-R  0.11

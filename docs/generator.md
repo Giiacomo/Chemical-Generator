@@ -87,3 +87,15 @@ R-BB-R  0.5
 ```
 
 ## Dev Notes 🛠️
+
+The generator is composed of a class `ReactionGenerator`, that has a constructor that saves the data parsed by the GeneratorIO class. It also has a `run_generation` method that executes all the step in order to obtain the generated reactions and the new species.
+
+Let's see in detail how it works!
+
+First of all, it generates the catalyzers following these steps:
+- In order for a specie to be acatalyzers it needs to be in the length range defined in the input file
+- It first chooses the catalyzers for condensation:
+    1. If there are enough catalyzer species for each class of reaction, every class of reaction will happen. For each reaction a catalyzer specie is extracted randomly to be the chosen catalyzer for that reaction, and is removed from the pool of extractable catalyzer species.
+    2. otherwise **n** class of reactions will be randomly chosen to happen (where **n** is the number of species that serve as catalyzers), then the same happens for this case, so for each chosen reaction, a catalyzer specie will be assigned.
+    3. For both cases this will happen: if the chosen catalyzers are less than 
+    
