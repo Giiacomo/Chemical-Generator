@@ -110,20 +110,27 @@ class ReactionGenerator:
         species = [specie for specie in species if specie != "Cont"]
 
         for specie_name in species:
-            for i in range(1, len(specie_name)):
-                cleavage_1 = specie_name[:i]
-                cleavage_2 = specie_name[i:]
-                for reaction in reactions:
-                    reactant = reaction[0]
-                    reactant_length = len(reactant)
-                    reactant_half_length = reactant_length // 2
-                    if cleavage_1.endswith(reactant[:reactant_half_length]) and cleavage_2.startswith(reactant[reactant_half_length:]):
-                        new_reaction = [specie_name, cleavage_1, cleavage_2, reaction[1]]
+            for reaction in reactions:
+                reactant = reaction[0]
+                reaction_speed = reaction[1]
+                n_split = int(reaction[2])
+
+                reactant_length = len(reactant)
+
+                # Generate cleavages based on n_split
+                if len(specie_name) >= n_split:
+                    cleavage_1 = specie_name[:n_split]
+                    cleavage_2 = specie_name[n_split:]
+
+                    # Check if cleavages match the reactant pattern
+                    if cleavage_1.endswith(reactant[:len(cleavage_1)]) and cleavage_2.startswith(reactant[len(cleavage_1):]):
+                        new_reaction = [specie_name, cleavage_1, cleavage_2, reaction_speed]
                         catalyzer = self.get_reaction_catalyzer(reaction)
                         new_reaction.append(catalyzer)
                         cleavage_reactions.append(new_reaction)
 
         return cleavage_reactions
+
 
 
     def generate_new_species(self):
@@ -136,7 +143,6 @@ class ReactionGenerator:
     
         while True:
             new_cleavage_products = self.generate_cleavage_reactions(new_species)
-            print(new_cleavage_products)
             cleavage_products.extend(new_cleavage_products)
 
             new_species_set = {product[1] for product in cleavage_products}
@@ -158,14 +164,7 @@ class ReactionGenerator:
             # Add new cleavage reactions for the newly generated species
             new_cleavage_reactions = self.generate_cleavage_reactions(new_species_to_add)
             self.cll_reactions.extend(new_cleavage_reactions)
-            print()
-            print("TEST")
-            print(new_species)
-            print()
             new_species.extend([specie[0] for specie in new_species_to_add])
-            print()
-            print(new_species)
-            print()
 
         return current_species_set
 
@@ -195,7 +194,7 @@ class ReactionGenerator:
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
         self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
         
-        self.generate_new_species()
+        #self.generate_new_species()
 
         generated_data = {
             "catalyzers": self.catalyzers,

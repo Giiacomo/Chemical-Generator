@@ -87,16 +87,48 @@ class GeneratorIO(BaseIO):
         return data, catalyzer_params_counter
 
     def _parse_reactions(self, line, data):
-        #info
+        # Info
         self.initial_species_count = len(data["species"])
 
+        # Remove "R-" and "-R" from each part and split the line
         parts = [part.replace("R-", "").replace("-R", "") for part in line.split()]
-        if len(parts) == 3:
+
+        # Check if the parts length is 3
+        if len(parts) != 3:
+            raise ValueError(
+                "Error!\nCondensation correct form:\n<reactant_1> <reactant_2> <reaction_speed>\nCleavage correct form:\n<reactant> <reaction_speed> <n_split>"
+            )
+
+        try:
+            # Attempt to convert parts[1] to float
+            reaction_speed = float(parts[1])
+            
+            # If parts[1] is a valid float, further check for cleavage reaction validity
+            try:
+                n_split = int(parts[2])
+                # Debugging print statement
+                print(f"n_split: {n_split}, len(parts[0]): {len(parts[0])}, condition: {n_split >= len(parts[0])}")
+                if n_split >= len(parts[0]):
+                    raise RuntimeError("Error!\nThe value of the third parameter for cleavage reaction class must be less than the size of the defined string\nFor example R-AABBA-R, n_split must be < 5!")
+                # If all checks pass, append to clls
+                data["reactions"]["clls"].append(parts)
+            except ValueError:
+                # Propagate the error for invalid n_split
+                raise ValueError(
+                    "Error!\nCleavage correct form:\n<reactant> <reaction_speed> <n_split>"
+                )
+        except ValueError:
+            # If parts[1] is not a float, append to conds
             data["reactions"]["conds"].append(parts)
-        elif len(parts) == 2:
-            data["reactions"]["clls"].append(parts)
-        else:
-            raise ValueError("Error!\nCondensation correct form:\n<reactant_1> <reactant_2> <reaction_speed>\nCleavage correct form:\n<reactant> <reaction_speed>")
+            return
+
+        # Print parts for debugging
+        print(parts)
+
+
+
+    
+
 
     def write_data(self, data):
         with open(self.output_file, 'w') as file:
