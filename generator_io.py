@@ -101,8 +101,15 @@ class GeneratorIO(BaseIO):
     def write_data(self, data):
         with open(self.output_file, 'w') as file:
             counter_species = 0
+            max_lengths = [0] * len(data["species"][0])
             for specie in data["species"]:
-                file.write(" ".join(specie) + "\n")
+                for i, item in enumerate(specie):
+                    max_lengths[i] = max(max_lengths[i], len(str(item)))
+
+            # Write data with fixed width columns
+            for specie in data["species"]:
+                formatted_specie = [str(item).ljust(max_lengths[i]) for i, item in enumerate(specie)]
+                file.write("\t".join(formatted_specie) + "\n")
                 counter_species += 1
 
             file.write("\n")
@@ -123,6 +130,12 @@ class GeneratorIO(BaseIO):
 
             #Debug info
             if self.debug:
+                file.write("\n")
+                file.write("# Debug Summary:\n")
+                file.write(f"# Total species lines written: {counter_species}\n")
+                file.write(f"# Total cond reaction lines written: {self.counter_cond}\n")
+                file.write(f"# Total cll reaction lines written: {self.counter_cll}\n")
+
                 self.print_info(data)
     
     def print_info(self, data):
