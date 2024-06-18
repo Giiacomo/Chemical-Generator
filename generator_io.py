@@ -16,6 +16,9 @@ class BaseIO:
                     if not line or line.startswith('#'):
                         continue
                     data, current_section, catalyzer_params_counter = self._process_line(line, data, current_section, catalyzer_params_counter)
+
+            self._validate_system_params(data.get('system', {}))
+        
         except FileNotFoundError:
             print("Error: File not found.")
             sys.exit(1)
@@ -26,6 +29,21 @@ class BaseIO:
             print("Error:", str(e))
             sys.exit(1)
         return data
+
+    def _validate_system_params(self, system_data):
+        required_params = {'ML', 'D_CONCENTRATION', 'D_CONTRIB'}
+        if not required_params.issubset(system_data.keys()):
+            missing = required_params - system_data.keys()
+            raise ValueError(f"Error!\n Missing system parameters: {', '.join(missing)}")
+
+    def _parse_system_param(self, line, system_data):
+        parts = line.split()
+        possible_params = ['ML', 'D_CONCENTRATION', 'D_CONTRIB']
+
+        if len(parts) != 2 or parts[0] not in possible_params:
+            raise ValueError("Error!\nInvalid parameter. Check the documentation to understand system parameters!")
+
+        system_data[parts[0]] = parts[1]
 
     def _parse_species(self, line):
         parts = line.split()
@@ -88,48 +106,33 @@ class GeneratorIO(BaseIO):
         elif current_section == 'reactions':
             self._parse_reactions(line, data)
         elif current_section == 'system':
-            data[current_section] = self._parse_system_param(line)
+            self._parse_system_param(line, data['system'])
         return data, catalyzer_params_counter
-
-    def _parse_system_param(self, line):
-        parts = line.split()
-        if len(parts) != 2 or parts[0] != 'LM':
-            raise ValueError("Error!\nSystem parameter LM expected.")
-        return {'lm': int(parts[1])}
 
 
     def _parse_reactions(self, line, data):
-        # Info
         self.initial_species_count = len(data["species"])
 
-        # Remove "R-" and "-R" from each part and split the line
         parts = [part.replace("R-", "").replace("-R", "") for part in line.split()]
 
-        # Check if the parts length is 3
         if len(parts) != 3:
             raise ValueError(
                 "Error!\nCondensation correct form:\n<reactant_1> <reactant_2> <reaction_speed>\nCleavage correct form:\n<reactant> <reaction_speed> <n_split>"
             )
 
         try:
-            # Attempt to convert parts[1] to float
             reaction_speed = float(parts[1])
             
-            # If parts[1] is a valid float, further check for cleavage reaction validity
             try:
                 n_split = int(parts[2])
-                # Debugging print statement
                 if n_split >= len(parts[0]):
                     raise RuntimeError("Error!\nThe value of the third parameter for cleavage reaction class must be less than the size of the defined string\nFor example R-AABBA-R, n_split must be < 5!")
-                # If all checks pass, append to clls
                 data["reactions"]["clls"].append(parts)
             except ValueError:
-                # Propagate the error for invalid n_split
                 raise ValueError(
                     "Error!\nCleavage correct form:\n<reactant> <reaction_speed> <n_split>"
                 )
         except ValueError:
-            # If parts[1] is not a float, append to conds
             data["reactions"]["conds"].append(parts)
             return
 
@@ -146,7 +149,6 @@ class GeneratorIO(BaseIO):
                 for i, item in enumerate(specie):
                     max_lengths[i] = max(max_lengths[i], len(str(item)))
 
-            # Write data with fixed width columns
             for specie in data["species"]:
                 formatted_specie = [str(item).ljust(max_lengths[i]) for i, item in enumerate(specie)]
                 file.write("\t".join(formatted_specie) + "\n")
@@ -168,12 +170,11 @@ class GeneratorIO(BaseIO):
                     file.write(r[0] + " + " + catalyzer['catalyzer_specie'] + " > " + r[1] + " + " + r[2] + " + " + catalyzer['catalyzer_specie'] + " ; " + r[3] + "\n")
                     self.counter_cll += 1
 
-            #Debug info
             if self.debug:
                 self.print_info(data)
                 file.write("\n")
                 file.write("# Debug Summary:\n")
-                file.write(f"# Total species lines written: {self.new_species_count}\n")
+                file.write(f"# Total new species generated: {self.new_species_count}\n")
                 file.write(f"# Total cond reaction lines written: {self.counter_cond}\n")
                 file.write(f"# Total cll reaction lines written: {self.counter_cll}\n")
     
@@ -182,7 +183,7 @@ class GeneratorIO(BaseIO):
 
         self.new_species_count = len(data["species"]) - self.initial_species_count
         print(f"{self.new_species_count} new species have been generated:")
-        print(", ".join([species[0] for species in data["species"][self.initial_species_count:]]))
+        #print(", ".join([species[0] for species in data["species"][self.initial_species_count:]]))
         print()
         print(f"{self.counter_cond} condensation reactions have been generated")
         print(f"{self.counter_cll} cleavage reactions have been generated")
@@ -203,22 +204,23 @@ class GeneratorIO(BaseIO):
         print("Condensation reactions:")
         for catalyzer in data["catalyzers"]["eligible_cond_species"]:
             reaction = catalyzer['reaction']
-            print(f"{catalyzer['catalyzer_specie']} is assigned to reaction:\t R-{reaction[0]} + {reaction[1]}-R")
+            print(f"\t- {catalyzer['catalyzer_specie']} is assigned to reaction\t⟶\tR-{reaction[0]} + {reaction[1]}-R")
 
         print("\nCleavage reactions:")
         for catalyzer in data["catalyzers"]["eligible_cll_species"]:
             reaction = catalyzer['reaction']
-            print(f"{catalyzer['catalyzer_specie']} is assigned to reaction:\t R-{reaction[0]}-R")
+            print(f"\t- {catalyzer['catalyzer_specie']} is assigned to reaction\t⟶\tR-{reaction[0]}-R")
 
 
 
 
-# Class to handle AutoTool input-output
-class AutoToolIO(BaseIO):
+class GenToolIO(BaseIO):
 
     def _process_line(self, line, data, current_section, catalyzer_params_counter):
-        
-        if line.startswith('SPECIES'):
+        if line.startswith('SYSTEM'):
+            current_section = 'system'
+            data[current_section] = {}
+        elif line.startswith('SPECIES'):
             current_section = 'species'
             data[current_section] = []
         elif line.startswith('CATALYZER_PARAMS'):
@@ -235,7 +237,9 @@ class AutoToolIO(BaseIO):
         return data, current_section, catalyzer_params_counter
 
     def _read_data(self, line, data, current_section, catalyzer_params_counter):
-        if current_section == 'species':
+        if current_section == 'system':
+            self._parse_system_param(line, data['system'])
+        elif current_section == 'species':
             data[current_section].append(self._parse_species(line))
         elif current_section == 'catalyzer_params':
             data[current_section].append(self._parse_catalyzer_param(line, catalyzer_params_counter))
@@ -258,13 +262,19 @@ class AutoToolIO(BaseIO):
 
     def write_data(self, data):
         with open(self.output_file, 'w') as file:
+
+            file.write("SYSTEM\n")
+            for key, value in data['system'].items():
+                file.write(f"{key} {value}\n")
+            file.write("\n")
+
             file.write("SPECIES\n")
             for specie in data["species"]:
                 file.write(" ".join(specie) + "\n")
 
             file.write("\nCATALYZER_PARAMS\n")
             first_cata_line = ",".join(map(str, data['catalyzer_params'][0]))
-            file.write(first_cata_line + "\n")  # Write the first catalyzer parameter line
+            file.write(first_cata_line + "\n")  
             for param in data['catalyzer_params'][1:]:
                 file.write(str(param) + "\n")       
 
@@ -276,5 +286,5 @@ class AutoToolIO(BaseIO):
             file.write("\n")
 
             for r in data["gen-clls"]["reactions"]:
-                file.write(f'R-{r}-R\t{data["gen-clls"]["v"]}\n')
+                file.write(f'R-{r}-R\t{data["gen-clls"]["v"]}\t 1\n')
             print(f"\nThe chemical {self.output_file} has been generated and is ready to be used as input to the actual chemical generator!\n")

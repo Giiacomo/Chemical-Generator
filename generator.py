@@ -141,17 +141,16 @@ class ReactionGenerator:
         cll_species = {product for reaction in self.cll_reactions for product in reaction[1:3]}
         
         new_species = list(cond_species | cll_species)
-        new_species_formatted = [(specie, '1.00E-15', '0.') for specie in new_species]
+        new_species_formatted = [(specie, self.system["D_CONCENTRATION"], self.system["D_CONTRIB"]) for specie in new_species]
 
         self.species.extend(new_species_formatted)
         self.species = list(set(tuple(specie) for specie in self.species))
 
         while True:
             current_species = [specie[0] for specie in self.species if specie[0] != self.container[0]]
-            new_species_short = [specie for specie in current_species if len(specie) <= self.system['lm']]
+            new_species_short = [specie for specie in current_species if len(specie) <= int(self.system['ML'])]
 
             new_condensation_products = self.generate_condensation_reactions(new_species_short)
-
             new_cleavage_products = self.generate_cleavage_reactions(current_species)
 
             new_species_set = set([product[0] for product in new_condensation_products])
@@ -161,15 +160,16 @@ class ReactionGenerator:
             new_species_list = list(new_species_set)
             new_species_list = [specie for specie in new_species_list if specie not in current_species]
 
+            self.cond_reactions.extend(new_condensation_products)
+            self.cll_reactions.extend(new_cleavage_products)
+
             if not new_species_list:
                 break
 
-            new_species_formatted = [[specie, '1.00E-15', '0.'] for specie in new_species_list]
+            new_species_formatted = [[specie, self.system["D_CONCENTRATION"], self.system["D_CONTRIB"]] for specie in new_species_list]
             self.species.extend(new_species_formatted)
             self.species = list(set(tuple(specie) for specie in self.species))   
 
-            self.cond_reactions.extend(new_condensation_products)
-            self.cll_reactions.extend(new_cleavage_products)
 
         self.species = list(set(tuple(specie) for specie in self.species))
 
@@ -235,7 +235,6 @@ if __name__ == "__main__":
     generatorIO = GeneratorIO(file_path, debug, output_file)
     try:
         parsed_data = generatorIO.parse_data()
-        print(parsed_data["system"])
         generator = ReactionGenerator(parsed_data)
         generated_data = generator.run_generation()
 

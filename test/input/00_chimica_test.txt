@@ -1,5 +1,11 @@
 SYSTEM
-LM 4
+#POSSIBLE PARAMS ARE 
+#   -ML: maximum species length in order to partake in generate_new_species condensation reactions.
+#   -D_CONCENTRATION: default species concentration
+#   -D_CONTRIB: default specie contribution to the membrane
+ML                  6
+D_CONCENTRATION     1.00E-15
+D_CONTRIB           0.
 
 SPECIES
 #FORMA 

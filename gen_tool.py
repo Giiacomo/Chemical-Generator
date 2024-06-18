@@ -1,5 +1,5 @@
 import sys
-from generator_io import AutoToolIO
+from generator_io import GenToolIO
 
 def generate_condensation_reactions(data):
 
@@ -44,13 +44,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     file_path = sys.argv[1]
-    autotoolIO = AutoToolIO(file_path)
+    genTool = GenToolIO(file_path)
     try:
-        parsed_data = autotoolIO.parse_data()
+        parsed_data = genTool.parse_data()
         parsed_data["gen-conds"] = generate_condensation_reactions(parsed_data)
         parsed_data["gen-clls"] = generate_cleavage_reactions(parsed_data)
 
-        autotoolIO.write_data(parsed_data)
+        genTool.write_data(parsed_data)
         
     except Exception as e:
         print("An error occurred:", str(e))

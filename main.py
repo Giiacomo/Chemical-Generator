@@ -5,7 +5,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description="Run Generator or AutoTool based on the provided flag.")
     parser.add_argument("file_path", help="The path to the input file.")
-    group = parser.add_mutually_exclusive_group(required=True) #just one, either gen or tool
+    group = parser.add_mutually_exclusive_group(required=True) #just one, either gen or tooq
     group.add_argument("-generator", action="store_true", help="Run the generator script.")
     group.add_argument("-gentool", action="store_true", help="Run the gentool script.")
     parser.add_argument("-o", "--output", help="The name of the output file.")
@@ -18,7 +18,7 @@ def main():
     debug = args.debug
 
     if args.generator:
-        # Run generator
+        print("Running generation process!")
         command = ["python3", "generator.py", file_path]
         if output_file:
             command += ["-o", output_file]
@@ -26,7 +26,7 @@ def main():
             command.append("-debug")
 
     elif args.gentool:
-        # Run gen-tool
+        print("Running tool process!")
         command = ["python3", "gen_tool.py", file_path]
 
     else:
