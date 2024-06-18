@@ -72,6 +72,9 @@ class GeneratorIO(BaseIO):
         elif line.startswith('REACTIONS'):
             current_section = 'reactions'
             data[current_section] = {"conds": [], "clls": []}
+        elif line.startswith('SYSTEM'):
+            current_section = 'system'
+            data[current_section] = {}
         else:
             data, catalyzer_params_counter = self._read_data(line, data, current_section, catalyzer_params_counter)
         return data, current_section, catalyzer_params_counter
@@ -84,7 +87,16 @@ class GeneratorIO(BaseIO):
             catalyzer_params_counter += 1
         elif current_section == 'reactions':
             self._parse_reactions(line, data)
+        elif current_section == 'system':
+            data[current_section] = self._parse_system_param(line)
         return data, catalyzer_params_counter
+
+    def _parse_system_param(self, line):
+        parts = line.split()
+        if len(parts) != 2 or parts[0] != 'LM':
+            raise ValueError("Error!\nSystem parameter LM expected.")
+        return {'lm': int(parts[1])}
+
 
     def _parse_reactions(self, line, data):
         # Info
@@ -107,7 +119,6 @@ class GeneratorIO(BaseIO):
             try:
                 n_split = int(parts[2])
                 # Debugging print statement
-                print(f"n_split: {n_split}, len(parts[0]): {len(parts[0])}, condition: {n_split >= len(parts[0])}")
                 if n_split >= len(parts[0]):
                     raise RuntimeError("Error!\nThe value of the third parameter for cleavage reaction class must be less than the size of the defined string\nFor example R-AABBA-R, n_split must be < 5!")
                 # If all checks pass, append to clls
@@ -121,9 +132,6 @@ class GeneratorIO(BaseIO):
             # If parts[1] is not a float, append to conds
             data["reactions"]["conds"].append(parts)
             return
-
-        # Print parts for debugging
-        print(parts)
 
 
 

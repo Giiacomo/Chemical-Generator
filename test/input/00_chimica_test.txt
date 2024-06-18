@@ -1,3 +1,6 @@
+SYSTEM
+LM 4
+
 SPECIES
 #FORMA 
 #PRIMA RIGA = <CONTENITORE>
@@ -10,7 +13,8 @@ B	    1.00E-15	0.
 AA	    1.00E-15	0.
 AB	    1.00E-15	0.
 BA	    1.00E-15	0.
-ABB    1.00E-15	0.
+BB	    1.00E-15	0.
+AABB    1.00E-15	0.
 
 CATALYZER_PARAMS
 #FORMA
@@ -20,7 +24,7 @@ CATALYZER_PARAMS
 #QUARTA RIGA = <catalizzatore di condensazione può esserlo anche di cleavage: ON/OFF>
 2,6
 1
-1
+3
 ON
 
 
@@ -29,10 +33,11 @@ REACTIONS
 #REAGENTE_1 = <stringa qualsiasi che termina in AB>
 #REAGENTE_2 = <stringa qualsiasi che inizia con AB> 
 #V_i = <velocità associata alla condensazione>
-R-AB    BA-R    0.1 
-R-BA    AB-R    0.2
+R-A     BA-R    0.1
 
 #FORMA CLLS
 #REAGENTE = <stringa generica, pattern, stringa generica>
 #V_i = <velocità associata alla condensazione>
-R-ABB-R  0.3     1
+R-AA-R  0.3 1
+R-BB-R  0.5 1
+R-ABB-R  0.5 2

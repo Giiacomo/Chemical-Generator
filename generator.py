@@ -8,9 +8,11 @@ class ReactionGenerator:
         self.species = data["species"]
         self.reactions = data["reactions"]
         self.catalyzer_params = data["catalyzer_params"]
+        self.container = data["species"][0]
         self.catalyzers = None
         self.cond_reactions = None
         self.cll_reactions = None
+        self.system = data["system"]
 
     def assign_catalyzers(self, num_catalyzers, eligible_species, reactions):
         catalyzer_list = []
@@ -85,14 +87,13 @@ class ReactionGenerator:
         return [c for c in self.catalyzers['eligible_cond_species'] + self.catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
 
     def generate_condensation_reactions(self, species):
-        species = species[1:]
         reactions = self.reactions["conds"]
         condensation_reactions = []
 
         for i in range(len(species)):
             for j in range(len(species)):
-                reagent_1 = species[i][0]
-                reagent_2 = species[j][0]
+                reagent_1 = species[i]
+                reagent_2 = species[j]
 
                 for reaction in reactions:
                     if reagent_1.endswith(reaction[0]) and reagent_2.startswith(reaction[1]):
@@ -111,23 +112,25 @@ class ReactionGenerator:
 
         for specie_name in species:
             for reaction in reactions:
-                reactant = reaction[0]
+                reactant_core = reaction[0]
                 reaction_speed = reaction[1]
                 n_split = int(reaction[2])
 
-                reactant_length = len(reactant)
+                start_index = specie_name.find(reactant_core)
+                while start_index != -1:
+                    end_index = start_index + len(reactant_core)
+                    
+                    if len(reactant_core) >= n_split:
+                        cleavage_1 = specie_name[:start_index + n_split]
+                        cleavage_2 = specie_name[start_index + n_split:]
 
-                # Generate cleavages based on n_split
-                if len(specie_name) >= n_split:
-                    cleavage_1 = specie_name[:n_split]
-                    cleavage_2 = specie_name[n_split:]
+                        if cleavage_1.endswith(reactant_core[:n_split]) and cleavage_2.startswith(reactant_core[n_split:]):
+                            new_reaction = [specie_name, cleavage_1, cleavage_2, reaction_speed]
+                            catalyzer = self.get_reaction_catalyzer(reaction)
+                            new_reaction.append(catalyzer)
+                            cleavage_reactions.append(new_reaction)
 
-                    # Check if cleavages match the reactant pattern
-                    if cleavage_1.endswith(reactant[:len(cleavage_1)]) and cleavage_2.startswith(reactant[len(cleavage_1):]):
-                        new_reaction = [specie_name, cleavage_1, cleavage_2, reaction_speed]
-                        catalyzer = self.get_reaction_catalyzer(reaction)
-                        new_reaction.append(catalyzer)
-                        cleavage_reactions.append(new_reaction)
+                    start_index = specie_name.find(reactant_core, start_index + 1)
 
         return cleavage_reactions
 
@@ -136,37 +139,40 @@ class ReactionGenerator:
     def generate_new_species(self):
         cond_species = {reaction[0] for reaction in self.cond_reactions}
         cll_species = {product for reaction in self.cll_reactions for product in reaction[1:3]}
-        new_species = list(cond_species | cll_species)
-        cleavage_products = []
         
-        current_species_set = {species[0] for species in self.species}
-    
+        new_species = list(cond_species | cll_species)
+        new_species_formatted = [(specie, '1.00E-15', '0.') for specie in new_species]
+
+        self.species.extend(new_species_formatted)
+        self.species = list(set(tuple(specie) for specie in self.species))
+
         while True:
-            new_cleavage_products = self.generate_cleavage_reactions(new_species)
-            cleavage_products.extend(new_cleavage_products)
+            current_species = [specie[0] for specie in self.species if specie[0] != self.container[0]]
+            new_species_short = [specie for specie in current_species if len(specie) <= self.system['lm']]
 
-            new_species_set = {product[1] for product in cleavage_products}
-            new_species_set.update({product[2] for product in cleavage_products})
-            # Filter out species that are already in the current set
-            new_species_to_add = [
-                product for product in new_species_set
-                if product not in current_species_set
-            ]
+            new_condensation_products = self.generate_condensation_reactions(new_species_short)
 
-            if not new_species_to_add:
+            new_cleavage_products = self.generate_cleavage_reactions(current_species)
+
+            new_species_set = set([product[0] for product in new_condensation_products])
+            new_species_set.update([product[1] for product in new_cleavage_products])
+            new_species_set.update([product[2] for product in new_cleavage_products])
+
+            new_species_list = list(new_species_set)
+            new_species_list = [specie for specie in new_species_list if specie not in current_species]
+
+            if not new_species_list:
                 break
 
-            new_species_to_add_formatted = [[specie, '1.00E-15', '0.'] for specie in new_species_to_add]
+            new_species_formatted = [[specie, '1.00E-15', '0.'] for specie in new_species_list]
+            self.species.extend(new_species_formatted)
+            self.species = list(set(tuple(specie) for specie in self.species))   
 
-            self.species.extend(new_species_to_add_formatted)
-            current_species_set.update(new_species_to_add)
+            self.cond_reactions.extend(new_condensation_products)
+            self.cll_reactions.extend(new_cleavage_products)
 
-            # Add new cleavage reactions for the newly generated species
-            new_cleavage_reactions = self.generate_cleavage_reactions(new_species_to_add)
-            self.cll_reactions.extend(new_cleavage_reactions)
-            new_species.extend([specie[0] for specie in new_species_to_add])
+        self.species = list(set(tuple(specie) for specie in self.species))
 
-        return current_species_set
 
     def eliminate_duplicate_reactions(self, reactions):
         reaction_dict = {}
@@ -186,15 +192,25 @@ class ReactionGenerator:
         
         return unique_reactions
 
+    def sort_species (self):
+        self.species.sort(key=lambda x: (len(x[0]), x[0]))
+        self.species = [self.container] + [specie for specie in self.species if specie[0] != self.container[0]]
+
+
     def run_generation(self):
         self.generate_catalyzers()
-        self.cond_reactions = self.generate_condensation_reactions(self.species)
+        self.cond_reactions = self.generate_condensation_reactions([specie[0] for specie in self.species[1:]])
         self.cll_reactions = self.generate_cleavage_reactions([specie[0] for specie in self.species[1:]])
 
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
         self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
         
-        #self.generate_new_species()
+        self.generate_new_species()
+
+        self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
+        self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
+        
+        self.sort_species()
 
         generated_data = {
             "catalyzers": self.catalyzers,
@@ -219,6 +235,7 @@ if __name__ == "__main__":
     generatorIO = GeneratorIO(file_path, debug, output_file)
     try:
         parsed_data = generatorIO.parse_data()
+        print(parsed_data["system"])
         generator = ReactionGenerator(parsed_data)
         generated_data = generator.run_generation()
 

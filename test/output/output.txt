@@ -1,16 +1,44 @@
-Cont	1.35E-16	0 
-A   	1.00E-15	0.
-B   	1.00E-15	0.
-AA  	1.00E-15	0.
-AB  	1.00E-15	0.
-BA  	1.00E-15	0.
-ABB 	1.00E-15	0.
+Cont    	1.35E-16	0 
+A       	1.00E-15	0.
+B       	1.00E-15	0.
+AA      	1.00E-15	0.
+AB      	1.00E-15	0.
+BA      	1.00E-15	0.
+BB      	1.00E-15	0.
+AAB     	1.00E-15	0.
+ABA     	1.00E-15	0.
+ABB     	1.00E-15	0.
+AABA    	1.00E-15	0.
+AABB    	1.00E-15	0.
+BABA    	1.00E-15	0.
+ABABA   	1.00E-15	0.
+AABABA  	1.00E-15	0.
+BABABA  	1.00E-15	0.
+ABABABA 	1.00E-15	0.
+AABABABA	1.00E-15	0.
+BABABABA	1.00E-15	0.
 
-AB + BA + AB > ABBA + AB ; 0.1
+A + BA + AABB > ABA + AABB ; 0.1
+AA + BA + AABB > AABA + AABB ; 0.1
+BA + BA + AABB > BABA + AABB ; 0.1
+ABA + BABA + AABB > ABABABA + AABB ; 0.1
+ABA + BA + AABB > ABABA + AABB ; 0.1
+A + BABA + AABB > ABABA + AABB ; 0.1
+BABA + BABA + AABB > BABABABA + AABB ; 0.1
+BABA + BA + AABB > BABABA + AABB ; 0.1
+AA + BABA + AABB > AABABA + AABB ; 0.1
+AABA + BABA + AABB > AABABABA + AABB ; 0.1
+AABA + BA + AABB > AABABA + AABB ; 0.1
 
-ABB + AA > A + BB + AA ; 0.3
+AA + BB > A + A + BB ; 0.3
+BB + AA > B + B + AA ; 0.5
+AABB + BB > A + ABB + BB ; 0.3
+AABB + AABB > AAB + B + AABB ; 0.5
+AAB + BB > A + AB + BB ; 0.3
+AABA + BB > A + ABA + BB ; 0.3
+ABB + AA > AB + B + AA ; 0.5
 
 # Debug Summary:
-# Total species lines written: 0
-# Total cond reaction lines written: 1
-# Total cll reaction lines written: 1
+# Total species lines written: 11
+# Total cond reaction lines written: 11
+# Total cll reaction lines written: 7
