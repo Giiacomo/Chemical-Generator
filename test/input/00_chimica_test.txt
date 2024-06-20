@@ -1,9 +1,11 @@
 SYSTEM
 #POSSIBLE PARAMS ARE 
 #   -ML: maximum species length in order to partake in generate_new_species condensation reactions.
+#   -CLL_ML_ACTIVE: <BOOL> whether ML filter should be applied to cleavage reactions too or not.
 #   -D_CONCENTRATION: default species concentration
 #   -D_CONTRIB: default specie contribution to the membrane
 ML                  6
+CLL_ML_ACTIVE       OFF
 D_CONCENTRATION     1.00E-15
 D_CONTRIB           0.
 

@@ -149,9 +149,14 @@ class ReactionGenerator:
         while True:
             current_species = [specie[0] for specie in self.species if specie[0] != self.container[0]]
             new_species_short = [specie for specie in current_species if len(specie) <= int(self.system['ML'])]
-
+            
             new_condensation_products = self.generate_condensation_reactions(new_species_short)
-            new_cleavage_products = self.generate_cleavage_reactions(current_species)
+            new_cleavage_products = [] 
+            
+            if self.system['CLL_ML_ACTIVE'] == 'ON':
+                new_cleavage_products = self.generate_cleavage_reactions(new_species_short)
+            else:
+                new_cleavage_products = self.generate_cleavage_reactions(current_species)
 
             new_species_set = set([product[0] for product in new_condensation_products])
             new_species_set.update([product[1] for product in new_cleavage_products])

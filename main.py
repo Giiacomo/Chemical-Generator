@@ -1,4 +1,5 @@
 import sys
+import time
 import subprocess
 import argparse
 
@@ -18,7 +19,7 @@ def main():
     debug = args.debug
 
     if args.generator:
-        print("Running generation process!")
+        print("\nRunning generation process!")
         command = ["python3", "generator.py", file_path]
         if output_file:
             command += ["-o", output_file]
@@ -26,7 +27,7 @@ def main():
             command.append("-debug")
 
     elif args.gentool:
-        print("Running tool process!")
+        print("\nRunning tool process!")
         command = ["python3", "gen_tool.py", file_path]
 
     else:
@@ -34,7 +35,11 @@ def main():
         sys.exit(1)
 
     try:
+        start_time = time.time()
         subprocess.run(command, check=True)
+        end_time = time.time()
+        elapsed_time = round(end_time - start_time, 2)
+        print(f"\nThe process took {elapsed_time} seconds!")
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the script: {e}")
         sys.exit(1)

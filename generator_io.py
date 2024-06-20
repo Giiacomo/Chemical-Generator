@@ -31,17 +31,16 @@ class BaseIO:
         return data
 
     def _validate_system_params(self, system_data):
-        required_params = {'ML', 'D_CONCENTRATION', 'D_CONTRIB'}
+        required_params = {'ML', 'CLL_ML_ACTIVE', 'D_CONCENTRATION', 'D_CONTRIB'}
         if not required_params.issubset(system_data.keys()):
             missing = required_params - system_data.keys()
             raise ValueError(f"Error!\n Missing system parameters: {', '.join(missing)}")
 
     def _parse_system_param(self, line, system_data):
         parts = line.split()
-        possible_params = ['ML', 'D_CONCENTRATION', 'D_CONTRIB']
-
+        possible_params = ['ML', 'CLL_ML_ACTIVE', 'D_CONCENTRATION', 'D_CONTRIB']
         if len(parts) != 2 or parts[0] not in possible_params:
-            raise ValueError("Error!\nInvalid parameter. Check the documentation to understand system parameters!")
+            raise ValueError("Error!\nInvalid parameter. Check the documentation to understand more about system parameters!")
 
         system_data[parts[0]] = parts[1]
 
@@ -265,7 +264,7 @@ class GenToolIO(BaseIO):
 
             file.write("SYSTEM\n")
             for key, value in data['system'].items():
-                file.write(f"{key} {value}\n")
+                file.write(f"{key}\t{value}\n")
             file.write("\n")
 
             file.write("SPECIES\n")
