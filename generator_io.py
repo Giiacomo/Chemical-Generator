@@ -44,6 +44,16 @@ class BaseIO:
 
         system_data[parts[0]] = parts[1]
 
+    def _parse_new_species_params(self, line):
+        parts = line.split()
+        if len(parts) != 4:
+            raise ValueError("Error!\nNEW_SPECIES_PARAMS correct form:\n<class lengths> <p_cata_cond> <p_cata_cll> <specificity>")
+        classes = parts[0].split(',')
+        p_cata_cond = float(parts[1])
+        p_cata_cll = float(parts[2])
+        specificity = int(parts[3])
+        return {cls: {'p_cata_cond': p_cata_cond, 'p_cata_cll': p_cata_cll, 'specificity': specificity} for cls in classes}
+
     def _parse_species(self, line):
         parts = line.split()
         if len(parts) != 3:
@@ -92,6 +102,9 @@ class GeneratorIO(BaseIO):
         elif line.startswith('SYSTEM'):
             current_section = 'system'
             data[current_section] = {}
+        elif line.startswith('NEW_SPECIES_PARAMS'):
+            current_section = 'new_species_params'
+            data[current_section] = {}
         else:
             data, catalyzer_params_counter = self._read_data(line, data, current_section, catalyzer_params_counter)
         return data, current_section, catalyzer_params_counter
@@ -106,6 +119,9 @@ class GeneratorIO(BaseIO):
             self._parse_reactions(line, data)
         elif current_section == 'system':
             self._parse_system_param(line, data['system'])
+        elif current_section == 'new_species_params':
+            new_params = self._parse_new_species_params(line)
+            data[current_section].update(new_params)
         return data, catalyzer_params_counter
 
 
@@ -222,6 +238,9 @@ class GenToolIO(BaseIO):
         elif line.startswith('SPECIES'):
             current_section = 'species'
             data[current_section] = []
+        elif line.startswith('NEW_SPECIES_PARAMS'):
+            current_section = 'new_species_params'
+            data[current_section] = {}
         elif line.startswith('CATALYZER_PARAMS'):
             current_section = 'catalyzer_params'
             data[current_section] = []
@@ -240,6 +259,9 @@ class GenToolIO(BaseIO):
             self._parse_system_param(line, data['system'])
         elif current_section == 'species':
             data[current_section].append(self._parse_species(line))
+        elif current_section == 'new_species_params':
+            new_params = self._parse_new_species_params(line)
+            data[current_section].update(new_params)
         elif current_section == 'catalyzer_params':
             data[current_section].append(self._parse_catalyzer_param(line, catalyzer_params_counter))
             catalyzer_params_counter += 1

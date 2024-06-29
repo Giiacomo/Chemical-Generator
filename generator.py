@@ -13,11 +13,13 @@ class ReactionGenerator:
         self.cond_reactions = None
         self.cll_reactions = None
         self.system = data["system"]
+        self.new_species_params = data["new_species_params"]
+        self.both_on = data["catalyzer_params"][3] == 'ON'
+
 
     def assign_catalyzers(self, num_catalyzers, eligible_species, reactions):
         catalyzer_list = []
         species_pool = eligible_species[:]
-
         if num_catalyzers > len(reactions):
             for reaction in reactions:
                 if not species_pool:
@@ -33,6 +35,7 @@ class ReactionGenerator:
                 chosen = random.choice(species_pool)
                 catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': reaction})
                 species_pool.remove(chosen)
+        
 
         while len(catalyzer_list) < num_catalyzers:
             if not species_pool:
@@ -42,11 +45,10 @@ class ReactionGenerator:
             available_reactions = [reaction for reaction in reactions if any(c['reaction'] == reaction for c in catalyzer_list)]
 
             if not available_reactions:
-                continue
+                break
 
             chosen_reaction = random.choice(available_reactions)
             catalyzer_list.append({'catalyzer_specie': chosen, 'reaction': chosen_reaction})
-
         return catalyzer_list
 
     def generate_catalyzers(self):
@@ -58,7 +60,6 @@ class ReactionGenerator:
         min_length, max_length = catalyzer_params[0]
         num_cond_catalyzers = catalyzer_params[1]
         num_cll_catalyzers = catalyzer_params[2]
-        both_on = catalyzer_params[3] == 'ON'
 
         eligible_species = [specie[0] for specie in species[1:] if min_length <= len(specie[0]) <= max_length]
         
@@ -68,23 +69,28 @@ class ReactionGenerator:
         self.catalyzers = {
             'eligible_cond_species': [],
             'eligible_cll_species': [],
-            'both_on': both_on,
+            'both_on': self.both_on,
             'num_cond_catalyzers': num_cond_catalyzers,
             'num_cll_catalyzers': num_cll_catalyzers
         }
 
         self.catalyzers['eligible_cond_species'] = self.assign_catalyzers(num_cond_catalyzers, eligible_species, cond_reactions)
 
-        if both_on:
+        if self.both_on:
             cll_candidates = eligible_species
         else:
             cll_candidates = [s for s in eligible_species if s not in [c['catalyzer_specie'] for c in self.catalyzers['eligible_cond_species']]]
 
         self.catalyzers['eligible_cll_species'] = self.assign_catalyzers(num_cll_catalyzers, cll_candidates, cll_reactions)
 
-    def get_reaction_catalyzer(self, reaction):
+    def get_reaction_catalyzer(self, reaction, reaction_type):
         reaction_tuple = tuple(reaction)
-        return [c for c in self.catalyzers['eligible_cond_species'] + self.catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
+        if reaction_type == 'cond':
+            return [c for c in self.catalyzers['eligible_cond_species'] if c['reaction'] == reaction_tuple]
+        elif reaction_type == 'cll':
+            return [c for c in self.catalyzers['eligible_cll_species'] if c['reaction'] == reaction_tuple]
+        else:
+            return None
 
     def generate_condensation_reactions(self, species):
         reactions = self.reactions["conds"]
@@ -98,7 +104,7 @@ class ReactionGenerator:
                 for reaction in reactions:
                     if reagent_1.endswith(reaction[0]) and reagent_2.startswith(reaction[1]):
                         new_reaction = [reagent_1 + reagent_2, reagent_1, reagent_2, reaction[2]]
-                        catalyzer = self.get_reaction_catalyzer(reaction)
+                        catalyzer = self.get_reaction_catalyzer(reaction, 'cond')
                         new_reaction.append(catalyzer)
                         condensation_reactions.append(new_reaction)
 
@@ -126,13 +132,50 @@ class ReactionGenerator:
 
                         if cleavage_1.endswith(reactant_core[:n_split]) and cleavage_2.startswith(reactant_core[n_split:]):
                             new_reaction = [specie_name, cleavage_1, cleavage_2, reaction_speed]
-                            catalyzer = self.get_reaction_catalyzer(reaction)
+                            catalyzer = self.get_reaction_catalyzer(reaction, 'cll')
                             new_reaction.append(catalyzer)
                             cleavage_reactions.append(new_reaction)
 
                     start_index = specie_name.find(reactant_core, start_index + 1)
 
         return cleavage_reactions
+
+    def generate_new_catalyzers(self, new_species):
+
+        cond_reactions = [tuple(r) for r in self.reactions["conds"]]
+        cll_reactions = [tuple(r) for r in self.reactions["clls"]]
+
+        for i in range(len(new_species)):
+            extracted_specie = random.choice(new_species)
+            len_extracted_specie = str(len(extracted_specie))
+            
+            if len_extracted_specie in self.new_species_params:    
+                extracted_specie_class = self.new_species_params[len_extracted_specie]
+                is_cond_catalyzer = random.random() <= extracted_specie_class['p_cata_cond']
+                is_cll_catalyzer = random.random() <= extracted_specie_class['p_cata_cll']
+
+                if not self.both_on and is_cond_catalyzer and is_cll_catalyzer:
+                    if random.random() <= 0.5:
+                        is_cond_catalyzer = False
+                    else:
+                        is_cll_catalyzer = False
+                #filter based on specificity
+                specificity = extracted_specie_class['specificity']
+                filtered_cond_reactions = [
+                    reaction for reaction in cond_reactions
+                    if len(reaction[0]) + len(reaction[1]) >= specificity
+                ]
+                filtered_cll_reactions = [
+                    reaction for reaction in cll_reactions
+                    if len(reaction[0]) >= specificity
+                ]
+
+                if is_cond_catalyzer:
+                    self.catalyzers['eligible_cond_species'].extend(self.assign_catalyzers(1, [extracted_specie], filtered_cond_reactions))
+                if is_cll_catalyzer:
+                    self.catalyzers['eligible_cll_species'].extend(self.assign_catalyzers(1, [extracted_specie], filtered_cll_reactions))
+
+
 
 
 
@@ -141,6 +184,10 @@ class ReactionGenerator:
         cll_species = {product for reaction in self.cll_reactions for product in reaction[1:3]}
         
         new_species = list(cond_species | cll_species)
+
+        self.generate_new_catalyzers(new_species)
+
+
         new_species_formatted = [(specie, self.system["D_CONCENTRATION"], self.system["D_CONTRIB"]) for specie in new_species]
 
         self.species.extend(new_species_formatted)
@@ -165,6 +212,8 @@ class ReactionGenerator:
             new_species_list = list(new_species_set)
             new_species_list = [specie for specie in new_species_list if specie not in current_species]
 
+            self.generate_new_catalyzers(new_species_list)
+
             self.cond_reactions.extend(new_condensation_products)
             self.cll_reactions.extend(new_cleavage_products)
 
@@ -174,7 +223,6 @@ class ReactionGenerator:
             new_species_formatted = [[specie, self.system["D_CONCENTRATION"], self.system["D_CONTRIB"]] for specie in new_species_list]
             self.species.extend(new_species_formatted)
             self.species = list(set(tuple(specie) for specie in self.species))   
-
 
         self.species = list(set(tuple(specie) for specie in self.species))
 
@@ -209,7 +257,6 @@ class ReactionGenerator:
 
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
         self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
-        
         self.generate_new_species()
 
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
