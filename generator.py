@@ -96,6 +96,9 @@ class ReactionGenerator:
         reactions = self.reactions["conds"]
         condensation_reactions = []
 
+        species = [specie for specie in species if specie != "Cont"]
+
+
         for i in range(len(species)):
             for j in range(len(species)):
                 reagent_1 = species[i]
@@ -123,9 +126,7 @@ class ReactionGenerator:
                 n_split = int(reaction[2])
 
                 start_index = specie_name.find(reactant_core)
-                while start_index != -1:
-                    end_index = start_index + len(reactant_core)
-                    
+                while start_index != -1:                    
                     if len(reactant_core) >= n_split:
                         cleavage_1 = specie_name[:start_index + n_split]
                         cleavage_2 = specie_name[start_index + n_split:]
@@ -225,7 +226,8 @@ class ReactionGenerator:
             self.species = list(set(tuple(specie) for specie in self.species))   
 
         self.species = list(set(tuple(specie) for specie in self.species))
-
+        self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
+        self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
 
     def eliminate_duplicate_reactions(self, reactions):
         reaction_dict = {}
@@ -252,15 +254,14 @@ class ReactionGenerator:
 
     def run_generation(self):
         self.generate_catalyzers()
+        
         self.cond_reactions = self.generate_condensation_reactions([specie[0] for specie in self.species[1:]])
         self.cll_reactions = self.generate_cleavage_reactions([specie[0] for specie in self.species[1:]])
 
         self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
         self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
+        
         self.generate_new_species()
-
-        self.cond_reactions = self.eliminate_duplicate_reactions(self.cond_reactions)
-        self.cll_reactions = self.eliminate_duplicate_reactions(self.cll_reactions)
         
         self.sort_species()
 

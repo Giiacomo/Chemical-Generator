@@ -5,7 +5,7 @@ SYSTEM
 #   -D_CONCENTRATION: default species concentration
 #   -D_CONTRIB: default specie contribution to the membrane
 ML                  6
-CLL_ML_ACTIVE       ON
+CLL_ML_ACTIVE       OFF
 D_CONCENTRATION     1.00E-15
 D_CONTRIB           0.
 
@@ -31,8 +31,8 @@ NEW_SPECIES_PARAMS
 #TERZA COLONNA = <probabilità della specie di diventare un catalizzatore per cleavage se estratta>
 #QUARTA COLONNA = <specificità (lunghezza della parte di specie esplicitata nelle classi di reazione)
 1,2,3,4       0.2         0.2     2
-5             0.1         0.05    5
-6,7,8         0.1         0.05    5
+5             0.1         0.05    2
+6,7,8         0.1         0.05    3
 
 
 CATALYZER_PARAMS
@@ -59,4 +59,4 @@ R-A     BA-R    0.1
 #V_i = <velocità associata alla condensazione>
 R-AA-R  0.3 1
 R-BB-R  0.5 1
-R-ABB-R  0.5 2
+R-AB-R  0.5 1
