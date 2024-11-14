@@ -93,16 +93,3 @@ Finally it executes the `generate_new_species` method, that follows these steps:
 - It then iterates the previous steps until convergence, when no new species have been generated. It is also important to remember that only the species that respect the ML filter in system section in input file, can partake in new reactions (all described in system section in input example).
 
 
-
-<!-- 
-At the end of the script execution, `parsed_data` takes the following structure:
-```py
-{
-'species':  [[<nomespecie>, <concentrazione>, <contributo>]],
-'catalyzer_params': [[<range>], <n_cond_catalyzers>, <n_cll_catalyzers>, <both_on>],  
-'reactions': {'conds': [<specie>], 'clls': [<specie>] },
-'catalyzers': {'cond': [<specie>], 'cll': [<specie>] },
-'cond_reactions': [<reactant_1>, <reactant_2>, <v>, [<catalyzers>]]
-'cll_reactions': [<specie>, <cleavage_1>, <cleavage_2>, <v>, [<catalyzers>]]
-}
-``` -->
